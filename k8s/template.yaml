@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: %%NAME%%
+  namespace: %%NAMESPACE%%
+  labels:
+    app: demo
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+      component: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: demo
+        component: database
+    spec:
+      containers:
+        - name: %%IMAGE%%
+          image: registry.codezero:5000/%%IMAGE%%
+          ports:
+            - containerPort: %%PORT%%
+      imagePullSecrets:
+        - name: registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: %%NAME%%
+  namespace: %%NAMESPACE%%
+  labels:
+    app: demo
+    component: database
+spec:
+  ports:
+    - protocol: TCP
+      port: %%PORT%%
+      targetPort: %%PORT%%
+  selector:
+    app: demo
+    component: database

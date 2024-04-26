@@ -1,0 +1,30 @@
+name: czctl-proto
+help: Prototype for czctl-run
+version: 0.1.0
+
+commands:
+  - name: run
+    help: Run and consume an image
+
+    flags:
+      - arg: port
+        long: --port
+        short: -p
+
+      - arg: service
+        long: --service
+        short: -s
+        required: true
+
+      - arg: namespace
+        long: --namespace
+        short: -n
+        required: true
+
+    args:
+      - name: image_name
+        required: true
+        unique: false
+
+  - name: images
+    help: Lists images in the registry

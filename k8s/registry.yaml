@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: codezero
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codezero
+      component: registry
+  template:
+    metadata:
+      labels:
+        app: codezero
+        component: registry
+    spec:
+      containers:
+      - name: registry
+        image: registry:2
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: registry-storage
+          mountPath: /var/lib/registry
+        - name: registry-certs
+          mountPath: /certs
+        env:
+        - name: REGISTRY_HTTP_ADDR
+          value: "0.0.0.0:5000"
+        - name: REGISTRY_HTTP_TLS_CERTIFICATE
+          value: "/certs/tls.crt"
+        - name: REGISTRY_HTTP_TLS_KEY
+          value: "/certs/tls.key"
+      volumes:
+      - name: registry-storage
+        emptyDir: {}
+      - name: registry-certs
+        secret:
+          secretName: registry-tls
+          items:
+          - key: tls.crt
+            path: tls.crt
+          - key: tls.key
+            path: tls.key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: codezero
+  labels:
+    app: codezero
+    component: registry
+spec:
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: codezero
+    component: registry
